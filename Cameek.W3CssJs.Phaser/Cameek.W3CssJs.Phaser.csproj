@@ -1,18 +1,38 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
+        <!-- Compiler Settings -->
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RazorLangVersion>8.0</RazorLangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+        <!-- NuGet Metadata -->
+        <PackageId>Cameek.W3CssJs.Phaser</PackageId>
+        <Version>3.9.0</Version>
+        <Authors>Cameek</Authors>
+        <Company>Cameek</Company>
+        <Description>Static Razor Class Library with Phaser (HTML5 Game Framework) assets for use in Blazor WebAssembly and Blazor Server apps.</Description>
+        <PackageTags>blazor;phaser;html5-game;game-engine;razor-class-library;webassets</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/cameekorg/Cameek.W3CssJs.Phaser</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/cameekorg/Cameek.W3CssJs.Phaser</PackageProjectUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
-
     <ItemGroup>
-        <SupportedPlatform Include="browser"/>
+        <SupportedPlatform Include="browser" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include=".scripts/download-phaser.bat" />
+        <Content Include=".scripts/download-phaser.sh" />
     </ItemGroup>
 
 </Project>
