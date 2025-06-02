@@ -30,9 +30,4 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Include=".scripts/download-phaser.bat" />
-        <Content Include=".scripts/download-phaser.sh" />
-    </ItemGroup>
-
 </Project>
