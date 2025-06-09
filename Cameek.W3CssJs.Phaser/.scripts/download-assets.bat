@@ -13,7 +13,7 @@
 
 @echo Configuring Version and URLs
 @echo ----------------------------
-set PHASER_VERSION=3.9.0
+set PHASER_VERSION=3.90.0
 set PHASER_BASE_URL=https://cdn.jsdelivr.net/npm/phaser@%PHASER_VERSION%/dist
 
 :: Phaser JS and License URLs
@@ -42,7 +42,7 @@ if not exist "%TARGET_JS_DIR%" mkdir "%TARGET_JS_DIR%"
 @echo Downloading Files
 @echo -----------------
 curl -L -o %TARGET_PHASER% %URL_PHASER%
-curl -L -o %TARGET_LICENSE% %URL_LICENSE%
+:: curl -L -o %TARGET_LICENSE% %URL_LICENSE%
 
 @echo.
 @echo.
