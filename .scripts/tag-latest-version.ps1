@@ -1,49 +1,45 @@
-# Powershell script to tag git with version from csproj, from any location
+<#
+Compatibility entry point for the common Bash tag command.
+Requires Bash (Git Bash on Windows, or the repository's WSL shell).
+Use -Yes to skip the normal confirmation, -Force to replace an existing tag,
+and -DryRun to preview without changing or pushing anything.
+#>
+[CmdletBinding()]
+param(
+    [switch]$Yes,
+    [switch]$Force,
+    [switch]$DryRun
+)
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
+$script = Join-Path $PSScriptRoot 'tag-latest-version.sh'
+$bash = $null
 
-# Find script and repo root regardless of current directory
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$repoRoot = Resolve-Path "$scriptDir\.."
-$csprojPath = Join-Path $repoRoot "Cameek.W3CssJs.Phaser\Cameek.W3CssJs.Phaser.csproj"
-
-# Go to repo root for git commands
-Set-Location $repoRoot
-
-# Parse version from .csproj
-[xml]$projXml = Get-Content $csprojPath
-$version = $projXml.Project.PropertyGroup.Version
-
-if ([string]::IsNullOrWhiteSpace($version)) {
-    Write-Error "Version not found in $csprojPath!"
-    exit 1
-}
-
-$tagName = "v$version"
-
-# Check if tag exists
-$existingTag = git tag --list "$tagName"
-if ($existingTag) {
-    Write-Warning "Tag $tagName already exists."
-    $confirm = Read-Host "Overwrite (delete and re-create) and push? (y/n)"
-    if ($confirm -ne "y") {
-        Write-Host "Aborted."
-        exit 1
+# Prefer Git Bash to Windows' legacy bash.exe WSL launcher. Git Bash accepts
+# this Windows checkout path and delegates all release logic to the same script.
+if ($env:OS -eq 'Windows_NT') {
+    $candidates = @()
+    foreach ($base in @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:LOCALAPPDATA)) {
+        if ($base) { $candidates += (Join-Path $base 'Git\bin\bash.exe') }
     }
-    git tag -d $tagName
-    git push origin :refs/tags/$tagName
+    $git = Get-Command git.exe -ErrorAction SilentlyContinue
+    if ($git) {
+        $gitRoot = Split-Path (Split-Path $git.Source -Parent) -Parent
+        $candidates += (Join-Path $gitRoot 'bin\bash.exe')
+    }
+    $bash = $candidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+} else {
+    $command = Get-Command bash -ErrorAction SilentlyContinue
+    if ($command) { $bash = $command.Source }
 }
 
-# Confirm before tagging (optional)
-Write-Host "About to create and push tag: $tagName"
-$confirm = Read-Host "Proceed? (y/n)"
-if ($confirm -ne "y") {
-    Write-Host "Aborted."
-    exit 1
+if (-not $bash) {
+    throw 'Bash is required. Install Git Bash on Windows, or run .scripts/tag-latest-version.sh directly from WSL.'
 }
 
-# Create and push tag
-git tag $tagName
-git push origin "refs/tags/$tagName"
-
-Write-Host "Tag $tagName created and pushed from project version $version."
+$arguments = @($script.Replace('\', '/'))
+if ($Yes) { $arguments += '--yes' }
+if ($Force) { $arguments += '--force' }
+if ($DryRun) { $arguments += '--dry-run' }
+& $bash @arguments
+exit $LASTEXITCODE

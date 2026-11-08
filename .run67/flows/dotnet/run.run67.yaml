@@ -1,0 +1,29 @@
+apiVersion: run67/v1
+kind: Flow
+
+metadata:
+  name: run
+  namespace: maintenance.dotnet
+  title: 🚀 Run from source
+  description: Start the configured development application with terminal input.
+  tags: [dotnet, development, run]
+
+target: local
+
+steps:
+  # Resolve the checkout before using repository-relative scripts.
+  - id: detect-repository-root
+    title: 📍 Locate repository
+    run:
+      executable: git
+      arguments: [rev-parse, --show-toplevel]
+
+  - id: run-project
+    title: 🚀 Run from source
+    run:
+      interaction: terminal
+      executable: bash
+      arguments:
+        - .scripts/project.sh
+        - run
+      workingDirectory: "${{ trim(steps.detect-repository-root.outputs.stdout) }}"
