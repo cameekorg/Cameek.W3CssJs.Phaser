@@ -1,61 +1,31 @@
-﻿@echo off
-@echo.
-@echo Download Phaser
-@echo ================
-@echo https://www.jsdelivr.com/package/npm/phaser
-@echo.
+@echo off
+setlocal EnableExtensions
 
-:: Shorten the prompt temporarily
-@prompt $S
+rem Keep this version aligned with the bundled upstream assets.
+set "PHASER_VERSION=3.90.0"
+set "PHASER_BASE_URL=https://cdn.jsdelivr.net/npm/phaser@%PHASER_VERSION%"
+set "TARGET_WWW_DIR=%~dp0..\wwwroot"
+set "DOWNLOAD_DIR=%TEMP%\cameek-phaser-%RANDOM%-%RANDOM%-%RANDOM%"
+if exist "%DOWNLOAD_DIR%" exit /b 1
+mkdir "%DOWNLOAD_DIR%" || exit /b 1
 
-:: Change to the script's directory
-@pushd %~dp0
+echo Downloading Phaser %PHASER_VERSION% assets and license...
+curl --fail --show-error --location "%PHASER_BASE_URL%/dist/phaser.min.js" --output "%DOWNLOAD_DIR%\phaser.min.js"
+if errorlevel 1 goto :error
+curl --fail --show-error --location "%PHASER_BASE_URL%/LICENSE.md" --output "%DOWNLOAD_DIR%\LICENSE-phaser.txt"
+if errorlevel 1 goto :error
 
-@echo Configuring Version and URLs
-@echo ----------------------------
-set PHASER_VERSION=3.90.0
-set PHASER_BASE_URL=https://cdn.jsdelivr.net/npm/phaser@%PHASER_VERSION%/dist
+rem Update the package only after both downloads have succeeded.
+if not exist "%TARGET_WWW_DIR%\js" mkdir "%TARGET_WWW_DIR%\js"
+if errorlevel 1 goto :error
+move /y "%DOWNLOAD_DIR%\phaser.min.js" "%TARGET_WWW_DIR%\js\phaser.min.js" >nul
+if errorlevel 1 goto :error
+move /y "%DOWNLOAD_DIR%\LICENSE-phaser.txt" "%TARGET_WWW_DIR%\LICENSE-phaser.txt" >nul
+if errorlevel 1 goto :error
+rmdir /s /q "%DOWNLOAD_DIR%"
+echo Downloaded Phaser %PHASER_VERSION% to %TARGET_WWW_DIR%
+exit /b 0
 
-:: Phaser JS and License URLs
-set URL_PHASER=%PHASER_BASE_URL%/phaser.min.js
-set URL_LICENSE=https://raw.githubusercontent.com/photonstorm/phaser/v%PHASER_VERSION%/license.txt
-
-@echo.
-@echo.
-
-@echo Configuring Target Directories and Files
-@echo ----------------------------------------
-set TARGET_WWW_DIR=../wwwroot
-set TARGET_JS_DIR=%TARGET_WWW_DIR%/js
-set TARGET_LICENSE=%TARGET_WWW_DIR%/LICENSE-phaser.txt
-set TARGET_PHASER=%TARGET_JS_DIR%/phaser.min.js
-
-@echo.
-@echo.
-
-@echo Creating Directories
-@echo --------------------
-if not exist "%TARGET_JS_DIR%" mkdir "%TARGET_JS_DIR%"
-@echo.
-@echo.
-
-@echo Downloading Files
-@echo -----------------
-curl -L -o %TARGET_PHASER% %URL_PHASER%
-:: curl -L -o %TARGET_LICENSE% %URL_LICENSE%
-
-@echo.
-@echo.
-
-:: Restore the previous directory
-@popd
-
-:: Reset the prompt to the default
-@prompt
-
-@echo.
-@echo ===================================
-@echo Finished downloading Phaser files
-@echo.
-
-@pause
+:error
+rmdir /s /q "%DOWNLOAD_DIR%"
+exit /b 1

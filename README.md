@@ -9,10 +9,31 @@
 
 ## ✨ Features
 
-* Ships **Phaser 3.9.0** minified JS
+* Ships **Phaser 3.90.0** minified JS
 * Easy integration for building 2D games and interactive experiences in Blazor
 * Hosted under `_content/Cameek.W3CssJs.Phaser` for straightforward referencing in Blazor apps
 * Ideal for educational, experimental, and commercial Blazor projects needing advanced JS game engines
+
+## Bundled assets and refresh
+
+This package bundles **Phaser 3.90.0**, the latest stable release in the existing
+3.x major version. Package **3.90.1** refreshes the download helpers and matching
+upstream license while retaining the Phaser 3 engine and existing asset URLs.
+
+The standalone script and matching MIT license come from the version-pinned
+[official npm distribution](https://www.npmjs.com/package/phaser/v/3.90.0) through
+jsDelivr. Consumers use the packaged files and do not require CDN access.
+
+Refresh the checked-in assets from the repository root:
+
+```bash
+bash Cameek.W3CssJs.Phaser/.scripts/download-assets.sh
+```
+
+On Windows, run `Cameek.W3CssJs.Phaser\.scripts\download-assets.bat`. Both scripts
+fail on HTTP errors and download the script and license before replacing package
+files. Their version tracks the bundled engine; the NuGet wrapper can receive
+independent patch increments.
 
 ---
 
@@ -21,13 +42,13 @@
 Install from NuGet:
 
 ```bash
-dotnet add package Cameek.W3CssJs.Phaser --version 3.9.0
+dotnet add package Cameek.W3CssJs.Phaser --version 3.90.1
 ```
 
 Or reference directly in your `.csproj`:
 
 ```xml
-<PackageReference Include="Cameek.W3CssJs.Phaser" Version="3.9.0" />
+<PackageReference Include="Cameek.W3CssJs.Phaser" Version="3.90.1" />
 ```
 
 ---
@@ -55,7 +76,7 @@ window.createPhaserGame = function (elementId) {
         parent: elementId,
         scene: {
             create: function () {
-                this.add.text(100, 140, "Hello Phaser!", { font: "24px Arial", fill: "#0099ff" });
+                this.add.text(100, 140, "Hello Phaser!", { font: "24px Arial", color: "#0099ff" });
             }
         }
     });
@@ -91,7 +112,7 @@ You can also manage Phaser scenes and assets from your Blazor components with cu
 
 ## 📄 License
 
-Phaser is licensed under the MIT License. See the [LICENSE-phaser.txt](https://github.com/photonstorm/phaser/blob/v3.9.0/license.txt) file included in this package for details.
+Phaser is licensed under the MIT License. See the [LICENSE-phaser.txt](https://github.com/phaserjs/phaser/blob/v3.90.0/LICENSE.md) file included in this package for details.
 
 ---
 
